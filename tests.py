@@ -1,3 +1,4 @@
+import pytest
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -24,19 +25,41 @@ class TestBooksCollector:
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
 
 # -----------------------------------------------------------------------------------------------------------------------------------
-# 2ой тест для метода set_book_genre с существующим жанром
-    def test_set_book_genre_add_existing_genre(self):
+# 1ый тест параметризирован для метода set_book_genre с существующим и несуществующим жанром
+    @pytest.mark.parametrize('genre, expected_genre', [
+    ('Детективы', 'Детективы'),
+    ('Романы', '')
+    ])
+    def test_set_book_genre_two_genres(self, genre, expected_genre):
+        collector_1 = BooksCollector()
+        collector_1.add_new_book('Я - легенда')
+        collector_1.set_book_genre('Я - легенда', genre)
+        assert collector_1.get_book_genre('Я - легенда') == expected_genre
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 2ой тест параметризирован для метода get_book_genre с существующей книгой в списке и несуществующей
+    @pytest.mark.parametrize('name, noname, genre, expected_genre', [
+    ('Шерлок Холмс', 'Я - легенда', 'Детективы', None),
+    ('Оно', 'Оно', 'Ужасы', 'Ужасы')
+    ])
+    def test_get_book_genre_existing_and_nonexisting_book(self, name, noname, genre, expected_genre):
         collector_2 = BooksCollector()
-        collector_2.add_new_book('Шерлок Холмс')
-        collector_2.set_book_genre('Шерлок Холмс', 'Детективы')
-        assert collector_2.get_book_genre('Шерлок Холмс') == 'Детективы'
+        collector_2.add_new_book(name)
+        collector_2.set_book_genre(name, genre)
+        assert collector_2.get_book_genre(noname) == expected_genre
 
 # -----------------------------------------------------------------------------------------------------------------------------------
-# 3ий тест для того же метода set_book_genre с несуществующим жанром
-    def test_set_book_genre_add_nonexisting_genre(self):
+# 3ий тест параметризирован для метода add_new_book, чтобы проверить работу с разной длиной книг: 20 символов (середина ограничения) и пограничные значения (39, 40, 41)
+    @pytest.mark.parametrize('name, expected_result', [
+        ('12345678901234567890', True),
+        ('123456789012345678901234567890123456789', True),
+        ('1234567890123456789012345678901234567890', True),
+        ('12345678901234567890123456789012345678901', False)
+        ])
+    def test_add_new_book_add_different_quantity(self, name, expected_result):
         collector_3 = BooksCollector()
-        collector_3.add_new_book('Я - легенда')
-        collector_3.set_book_genre('Я - легенда', 'Романы')
-        assert not collector_3.get_book_genre('Я - легенда') == 'Романы'
+        collector_3.add_new_book(name)
+        assert (name in collector_3.get_books_genre()) == expected_result
 
 # -----------------------------------------------------------------------------------------------------------------------------------
+# 
