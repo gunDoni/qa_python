@@ -106,18 +106,13 @@ class TestBooksCollector:
         assert len(collector_7.get_list_of_favorites_books()) == 1
 
 # -----------------------------------------------------------------------------------------------------------------------------------
-# 8ой тест параметризирован для метода delete_book_from_favorites. Проверяется удаление книги как существующей, так и отсутствующей в self.favorites
-    @pytest.mark.parametrize('add_to_favorites, expected_count', [
-        (True, 0),
-        (False, 0)
-    ])
-    def test_delete_book_from_favorites_existing_and_nonexisting(self, add_to_favorites, expected_count):
+# 8ой тест для метода delete_book_from_favorites. Проверяется удаление существующей книги в self.favorites
+    def test_delete_book_from_favorites_existing_book(self):
         collector_8 = BooksCollector()
         collector_8.add_new_book('Граф Монте-Кристо')
-        if add_to_favorites:
-            collector_8.add_book_in_favorites('Граф Монте-Кристо')
+        collector_8.add_book_in_favorites('Граф Монте-Кристо')
         collector_8.delete_book_from_favorites('Граф Монте-Кристо')
-        assert len(collector_8.get_list_of_favorites_books()) == expected_count
+        assert len(collector_8.get_list_of_favorites_books()) == 0
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # 9ый тест для метода add_book_in_favorites. Проверяется добавление несуществующей книги в списке книг.
@@ -131,3 +126,11 @@ class TestBooksCollector:
         collector_9.add_book_in_favorites('Сын волка')
         collector_9.add_book_in_favorites('Любовь к жизни')
         assert len(collector_9.get_list_of_favorites_books()) == 3
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 10ый тест, разделил 8ой на 2, чтобы было без if. Для метода delete_book_from_favorites. Проверяется удаление отсутствующей книги в self.favorites
+    def test_delete_book_from_favorites_nonexisting_book(self):
+        collector_10 = BooksCollector()
+        collector_10.add_new_book('Граф Монте-Кристо')
+        collector_10.delete_book_from_favorites('Граф Монте-Кристо')
+        assert len(collector_10.get_list_of_favorites_books()) == 0
