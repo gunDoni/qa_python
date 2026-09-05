@@ -62,4 +62,72 @@ class TestBooksCollector:
         assert (name in collector_3.get_books_genre()) == expected_result
 
 # -----------------------------------------------------------------------------------------------------------------------------------
-# 
+# 4ый тест на проверку метода get_books_genre с существующим и несуществующим жанрами
+    def test_get_books_genre_add_two_books(self):
+        collector_4 = BooksCollector()
+        collector_4.add_new_book('Смерть на Ниле')
+        collector_4.set_book_genre('Смерть на Ниле', 'Детективы')
+        collector_4.add_new_book('Алхимик')
+        collector_4.set_book_genre('Алхимик', 'Проза')
+        assert collector_4.get_books_genre() == {'Смерть на Ниле':'Детективы', 'Алхимик': ''}
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 5ый тест параметризирован для метода get_books_with_specific_genre с существующим и несуществующим жанрами
+    @pytest.mark.parametrize('name, genre, expected_result', [
+        ('Вечеринка в Хэллоуин', 'Детективы', ['Вечеринка в Хэллоуин']),
+        ('Идиот', 'Роман', [])
+    ])
+    def test_get_books_with_specific_genre_existing_and_nonexisting(self, name, genre, expected_result):
+        collector_5 = BooksCollector()
+        collector_5.add_new_book(name)
+        collector_5.set_book_genre(name, genre)
+        assert collector_5.get_books_with_specific_genre(genre) == expected_result
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 6ой тест параметризирован для метода get_books_for_children с разными вариантами проверки
+    @pytest.mark.parametrize('name, genre, expected_result', [
+        ('Черепашки-ниндзя', 'Мультфильмы', ['Черепашки-ниндзя']),
+        ('Убийство в "Восточном экспрессе"', 'Детективы', []),
+        ('Капитал', 'Экономика', [])
+    ])
+    def test_get_books_for_children_rated_and_unrated_and_nonexistent_genre(self, name, genre, expected_result):
+        collector_6 = BooksCollector()
+        collector_6.add_new_book(name)
+        collector_6.set_book_genre(name, genre)
+        assert collector_6.get_books_for_children() == expected_result
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 7ой тест для метода add_book_in_favorites. Проверил добавление дубликата
+    def test_add_book_in_favorites_add_duplicate(self):
+        collector_7 = BooksCollector()
+        collector_7.add_new_book('Задача трех тел')
+        collector_7.add_book_in_favorites('Задача трех тел')
+        collector_7.add_book_in_favorites('Задача трех тел')
+        assert len(collector_7.get_list_of_favorites_books()) == 1
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 8ой тест параметризирован для метода delete_book_from_favorites. Проверяется удаление книги как существующей, так и отсутствующей в self.favorites
+    @pytest.mark.parametrize('add_to_favorites, expected_count', [
+        (True, 0),
+        (False, 0)
+    ])
+    def test_delete_book_from_favorites_existing_and_nonexisting(self, add_to_favorites, expected_count):
+        collector_8 = BooksCollector()
+        collector_8.add_new_book('Граф Монте-Кристо')
+        if add_to_favorites:
+            collector_8.add_book_in_favorites('Граф Монте-Кристо')
+        collector_8.delete_book_from_favorites('Граф Монте-Кристо')
+        assert len(collector_8.get_list_of_favorites_books()) == expected_count
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# 9ый тест для метода add_book_in_favorites. Проверяется добавление несуществующей книги в списке книг.
+    def test_add_book_in_favorites_add_nonexistent_book(self):
+        collector_9 = BooksCollector()
+        collector_9.add_new_book('Белый клык')
+        collector_9.add_new_book('Зов предков')
+        collector_9.add_new_book('Сын волка')
+        collector_9.add_book_in_favorites('Белый клык')
+        collector_9.add_book_in_favorites('Зов предков')
+        collector_9.add_book_in_favorites('Сын волка')
+        collector_9.add_book_in_favorites('Любовь к жизни')
+        assert len(collector_9.get_list_of_favorites_books()) == 3
